@@ -167,7 +167,8 @@ router.get('/install', (req, res) => {
             .json({ error: 'SHOPIFY_API_KEY is not configured on the server.' });
     }
 
-    const redirectUri = `${SHOPIFY_APP_URL}/api/shopify-auth/callback`;
+    const appUrl = SHOPIFY_APP_URL || `${req.protocol}://${req.get('host')}`;
+    const redirectUri = `${appUrl}/api/shopify-auth/callback`;
     const nonce = crypto.randomBytes(16).toString('hex'); // CSRF token
 
     // In production you should store `nonce` in a short-lived session or cookie
@@ -285,9 +286,10 @@ router.post('/connect-store', protect, async (req, res) => {
 
         const store = await ShopifyStore.findOne({ shop, isActive: true });
         if (!store) {
+            const appUrl = SHOPIFY_APP_URL || `${req.protocol}://${req.get('host')}`;
             return res.status(404).json({
                 error: 'Store not found. Please install the app from your Shopify admin first.',
-                installUrl: `${SHOPIFY_APP_URL}/api/shopify-auth/install?shop=${encodeURIComponent(shop)}`,
+                installUrl: `${appUrl}/api/shopify-auth/install?shop=${encodeURIComponent(shop)}`,
             });
         }
 
