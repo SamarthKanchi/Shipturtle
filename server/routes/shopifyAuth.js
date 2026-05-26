@@ -161,10 +161,14 @@ router.get('/install', (req, res) => {
         return res.status(400).json({ error: 'Missing or invalid shop parameter.' });
     }
 
-    if (!SHOPIFY_API_KEY) {
-        return res
-            .status(500)
-            .json({ error: 'SHOPIFY_API_KEY is not configured on the server.' });
+    const PLACEHOLDER_PATTERNS = ['fill_after', 'your_shopify', 'your_api', 'placeholder', 'change_me'];
+    const isPlaceholder = (val) => !val || PLACEHOLDER_PATTERNS.some(p => val.toLowerCase().includes(p));
+
+    if (isPlaceholder(SHOPIFY_API_KEY) || isPlaceholder(SHOPIFY_API_SECRET)) {
+        return res.status(500).json({
+            error: 'Shopify OAuth is not configured yet. Please set real SHOPIFY_API_KEY and SHOPIFY_API_SECRET from your Shopify Partner Dashboard.',
+            docs: 'https://partners.shopify.com → Apps → your app → API credentials',
+        });
     }
 
     const appUrl = SHOPIFY_APP_URL || `${req.protocol}://${req.get('host')}`;
