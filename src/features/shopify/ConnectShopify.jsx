@@ -20,12 +20,26 @@ export default function ConnectShopify({ onConnected }) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
-    const normalise = (raw) =>
-        raw
-            .trim()
-            .toLowerCase()
-            .replace(/^https?:\/\//i, '')
-            .replace(/\/+$/, '');
+    const normalise = (raw) => {
+        let clean = raw.trim().toLowerCase();
+        
+        // Match admin.shopify.com/store/your-store-name
+        const adminMatch = clean.match(/admin\.shopify\.com\/store\/([a-zA-Z0-9-]+)/i);
+        if (adminMatch) {
+            return adminMatch[1];
+        }
+        
+        // Strip protocol
+        clean = clean.replace(/^https?:\/\//i, '').replace(/\/+$/, '');
+        
+        // Match shop-name.myshopify.com
+        const myshopifyMatch = clean.match(/^([a-zA-Z0-9-]+)\.myshopify\.com/i);
+        if (myshopifyMatch) {
+            return myshopifyMatch[1];
+        }
+        
+        return clean;
+    };
 
     const handleConnect = async () => {
         const normShop = normalise(shop);
