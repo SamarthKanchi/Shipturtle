@@ -1,10 +1,10 @@
+import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 import rateLimit from 'express-rate-limit';
-import dotenv from 'dotenv';
 import { connectDB } from './config/db.js';
 import authRoutes from './routes/auth.js';
 import vendorRoutes from './routes/vendors.js';
@@ -13,8 +13,6 @@ import orderRoutes from './routes/orders.js';
 import shopifyRoutes from './routes/shopify.js';
 import shopifyAuthRoutes from './routes/shopifyAuth.js';
 import chatRoutes from './routes/chat.js';
-
-dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
