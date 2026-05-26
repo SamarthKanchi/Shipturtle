@@ -11,6 +11,7 @@ import ProductsPage from '../features/products/ProductsPage';
 import AnalyticsPage from '../features/analytics/AnalyticsPage';
 import SettingsPage from '../features/settings/SettingsPage';
 import ShopifySync from '../features/shopify/ShopifySync';
+import ChatBot from '../features/chat/ChatBot';
 import ProtectedRoute from '../components/ProtectedRoute';
 
 const queryClient = new QueryClient({
@@ -42,6 +43,7 @@ export default function App() {
             <Route path="analytics" element={<AnalyticsPage />} />
             <Route path="settings" element={<SettingsPage />} />
             <Route path="shopify" element={<ShopifySync />} />
+            <Route path="chat" element={<ChatBot />} />
           </Route>
         </Routes>
       </BrowserRouter>

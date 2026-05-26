@@ -58,7 +58,7 @@ function ChartTooltip({ active, payload, label }) {
       <p className="text-xs text-zinc-400 mb-1">{label}</p>
       {payload.map((p, i) => (
         <p key={i} className="text-sm font-medium" style={{ color: p.color }}>
-          {p.name}: {typeof p.value === 'number' && p.value > 1000 ? `$${(p.value / 1000).toFixed(1)}K` : p.value}
+          {p.name}: {typeof p.value === 'number' && p.value > 1000 ? `₹${(p.value / 1000).toFixed(1)}K` : p.value}
         </p>
       ))}
     </div>
@@ -118,7 +118,7 @@ export default function AnalyticsPage() {
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
               <XAxis dataKey="name" tick={{ fontSize: 12, fill: '#71717A' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 12, fill: '#71717A' }} axisLine={false} tickLine={false} tickFormatter={v => `$${v / 1000}K`} />
+              <YAxis tick={{ fontSize: 12, fill: '#71717A' }} axisLine={false} tickLine={false} tickFormatter={v => `₹${v / 1000}K`} />
               <Tooltip content={<ChartTooltip />} />
               <Area type="monotone" dataKey="revenue" stroke="#3B82F6" strokeWidth={2} fill="url(#revGrad)" name="Revenue" />
             </AreaChart>
@@ -139,7 +139,7 @@ export default function AnalyticsPage() {
             <ResponsiveContainer width="100%" height={250}>
               <BarChart data={vendorData} layout="vertical">
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" horizontal={false} />
-                <XAxis type="number" tick={{ fontSize: 11, fill: '#71717A' }} axisLine={false} tickLine={false} tickFormatter={v => `$${v / 1000}K`} />
+                <XAxis type="number" tick={{ fontSize: 11, fill: '#71717A' }} axisLine={false} tickLine={false} tickFormatter={v => `₹${v / 1000}K`} />
                 <YAxis type="category" dataKey="name" tick={{ fontSize: 12, fill: '#A1A1AA' }} axisLine={false} tickLine={false} width={80} />
                 <Tooltip content={<ChartTooltip />} />
                 <Bar dataKey="revenue" fill="#3B82F6" radius={[0, 6, 6, 0]} barSize={20} name="Revenue" />

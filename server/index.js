@@ -11,6 +11,8 @@ import vendorRoutes from './routes/vendors.js';
 import productRoutes from './routes/products.js';
 import orderRoutes from './routes/orders.js';
 import shopifyRoutes from './routes/shopify.js';
+import shopifyAuthRoutes from './routes/shopifyAuth.js';
+import chatRoutes from './routes/chat.js';
 
 dotenv.config();
 
@@ -42,6 +44,8 @@ app.use('/api/vendors', vendorRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/shopify', shopifyRoutes);
+app.use('/api/shopify-auth', shopifyAuthRoutes);
+app.use('/api/chat', chatRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -74,4 +78,4 @@ const start = async () => {
 
 start().catch(console.error);
 
-export default app;
+export default app; // Reload triggered by Antigravity

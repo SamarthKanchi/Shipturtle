@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   User, Building2, CreditCard, Key, Bell, Store, Shield,
-  ChevronRight, Eye, EyeOff, Copy, Check, ExternalLink
+  ChevronRight, Eye, EyeOff, Copy, Check, ExternalLink, Loader2
 } from 'lucide-react';
+import api from '../../lib/api';
+import ConnectShopify from '../shopify/ConnectShopify';
 
 const tabs = [
   { id: 'general', label: 'General', icon: Building2 },
@@ -37,6 +39,7 @@ function GeneralSettings() {
         <div>
           <label className="block text-sm font-medium text-zinc-300 mb-1.5">Currency</label>
           <select className="input-field">
+            <option>INR — Indian Rupee</option>
             <option>USD — US Dollar</option>
             <option>EUR — Euro</option>
             <option>GBP — British Pound</option>
@@ -69,7 +72,7 @@ function BillingSettings() {
           <div>
             <div className="text-sm text-zinc-400">Current Plan</div>
             <div className="text-2xl font-bold mt-1">Growth</div>
-            <div className="text-sm text-zinc-500 mt-1">$149/month · Renews Jun 23, 2026</div>
+            <div className="text-sm text-zinc-500 mt-1">₹11,999/month · Renews Jun 23, 2026</div>
           </div>
           <button className="px-4 py-2 text-sm font-medium text-blue-400 rounded-xl border border-blue-500/20 hover:bg-blue-500/10 transition-colors">
             Upgrade Plan
@@ -150,11 +153,43 @@ function APISettings() {
 }
 
 function ShopifySettings() {
+  const [store, setStore] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api.get('/shopify-auth/connected-store')
+      .then(({ data }) => setStore(data.store))
+      .catch(() => setStore(null))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const handleDisconnect = async () => {
+    try {
+      await api.delete('/shopify-auth/disconnect');
+      setStore(null);
+    } catch (err) {
+      console.error('Disconnect failed:', err);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center gap-3 text-zinc-500 py-10">
+        <Loader2 size={18} className="animate-spin" />
+        <span className="text-sm">Loading store…</span>
+      </div>
+    );
+  }
+
+  if (!store) {
+    return <ConnectShopify onConnected={(s) => setStore(s)} />;
+  }
+
   return (
     <div className="space-y-6">
       <div>
         <h3 className="text-lg font-semibold mb-1">Shopify Integration</h3>
-        <p className="text-sm text-zinc-500">Manage connected Shopify stores.</p>
+        <p className="text-sm text-zinc-500">Manage your connected Shopify store.</p>
       </div>
       <div className="p-5 rounded-xl bg-zinc-900/50 border border-white/[0.06]">
         <div className="flex items-center justify-between">
@@ -163,23 +198,21 @@ function ShopifySettings() {
               <Store size={20} className="text-[#95BF47]" />
             </div>
             <div>
-              <div className="text-sm font-medium">techmarket-hub.myshopify.com</div>
+              <div className="text-sm font-medium">{store.shopName || store.shop}</div>
+              <div className="text-xs text-zinc-400">{store.shop}</div>
               <div className="text-xs text-emerald-400 flex items-center gap-1 mt-0.5">
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" /> Connected
               </div>
             </div>
           </div>
-          <button className="text-sm text-red-400 hover:text-red-300">Disconnect</button>
+          <button onClick={handleDisconnect} className="text-sm text-red-400 hover:text-red-300 transition-colors">
+            Disconnect
+          </button>
         </div>
-        <div className="mt-4 grid grid-cols-3 gap-4 pt-4 border-t border-white/[0.06]">
-          <div><div className="text-xs text-zinc-500">Products Synced</div><div className="text-sm font-medium mt-0.5">2,847</div></div>
-          <div><div className="text-xs text-zinc-500">Last Sync</div><div className="text-sm font-medium mt-0.5">2 min ago</div></div>
-          <div><div className="text-xs text-zinc-500">Webhooks</div><div className="text-sm font-medium mt-0.5">12 active</div></div>
+        <div className="mt-4 pt-4 border-t border-white/[0.06] text-xs text-zinc-500">
+          Connected on {store.installedAt ? new Date(store.installedAt).toLocaleDateString() : '—'}
         </div>
       </div>
-      <button className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-zinc-300 rounded-xl border border-white/[0.08] hover:bg-white/[0.03] transition-colors">
-        <Store size={16} /> Connect Another Store
-      </button>
     </div>
   );
 }
@@ -214,11 +247,10 @@ export default function SettingsPage() {
           <div className="flex lg:flex-col gap-1 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0">
             {tabs.map(tab => (
               <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${
-                  activeTab === tab.id
-                    ? 'bg-blue-500/10 text-blue-400'
-                    : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.03]'
-                }`}>
+                className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${activeTab === tab.id
+                  ? 'bg-blue-500/10 text-blue-400'
+                  : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.03]'
+                  }`}>
                 <tab.icon size={17} />
                 {tab.label}
               </button>

@@ -60,7 +60,7 @@ function CustomTooltip({ active, payload, label }) {
       <p className="text-xs text-zinc-400 mb-1">{label}</p>
       {payload.map((p, i) => (
         <p key={i} className="text-sm font-semibold" style={{ color: p.color }}>
-          {p.name === 'revenue' ? `$${(p.value / 1000).toFixed(1)}K` : p.value}
+          {p.name === 'revenue' ? `₹${(p.value / 1000).toFixed(1)}K` : p.value}
         </p>
       ))}
     </div>
@@ -119,7 +119,7 @@ export default function DashboardPage() {
   analytics?.statusBreakdown?.forEach(s => { statusCounts[s._id] = s.count; });
 
   const stats = [
-    { label: 'Total Revenue', value: totalRevenue, prefix: '$', change: '+12.5%', up: true, icon: DollarSign, color: 'from-emerald-500/20' },
+    { label: 'Total Revenue', value: totalRevenue, prefix: '₹', change: '+12.5%', up: true, icon: DollarSign, color: 'from-emerald-500/20' },
     { label: 'Total Orders', value: totalOrders, change: '+8.3%', up: true, icon: ShoppingCart, color: 'from-blue-500/20' },
     { label: 'Active Vendors', value: totalVendors, change: '+3', up: true, icon: Users, color: 'from-violet-500/20' },
     { label: 'Pending', value: statusCounts['pending'] || 0, change: '', up: false, icon: Truck, color: 'from-amber-500/20' },
@@ -189,7 +189,7 @@ export default function DashboardPage() {
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
                 <XAxis dataKey="name" tick={{ fontSize: 12, fill: '#71717A' }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 12, fill: '#71717A' }} axisLine={false} tickLine={false}
-                  tickFormatter={v => `$${v / 1000}K`} />
+                  tickFormatter={v => `₹${v / 1000}K`} />
                 <Tooltip content={<CustomTooltip />} />
                 <Area type="monotone" dataKey="revenue" stroke="#3B82F6" strokeWidth={2}
                   fill="url(#revenueGrad)" />
@@ -294,7 +294,7 @@ export default function DashboardPage() {
                       <td className="px-6 py-3 text-sm font-mono text-blue-400">{order.orderNumber}</td>
                       <td className="px-6 py-3 text-sm text-zinc-300">{order.customer?.name || 'Guest'}</td>
                       <td className="px-6 py-3 text-sm text-zinc-400 hidden sm:table-cell">{order.lineItems?.length || 0}</td>
-                      <td className="px-6 py-3 text-sm font-medium">${order.financials?.total?.toFixed(2) || '0.00'}</td>
+                      <td className="px-6 py-3 text-sm font-medium">₹{order.financials?.total?.toFixed(2) || '0.00'}</td>
                       <td className="px-6 py-3"><StatusBadge status={order.status} /></td>
                     </tr>
                   ))}

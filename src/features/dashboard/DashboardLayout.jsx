@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { Outlet, Link, useLocation } from 'react-router-dom';
+import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard, Users, Package, ShoppingCart, BarChart3,
   Settings, Search, Bell, ChevronLeft,
-  Sparkles, Command, Store, Menu
+  Sparkles, Command, Store, Menu, MessageCircle
 } from 'lucide-react';
 import Logo from '../../components/Logo';
 
@@ -17,6 +17,7 @@ const navItems = [
   { label: 'Analytics', icon: BarChart3, path: '/dashboard/analytics' },
   { label: 'Settings', icon: Settings, path: '/dashboard/settings' },
   { label: 'Shopify', icon: Store, path: '/dashboard/shopify' },
+  { label: 'AI Chat', icon: MessageCircle, path: '/dashboard/chat' },
 ];
 
 export default function DashboardLayout() {
@@ -25,6 +26,7 @@ export default function DashboardLayout() {
   const [searchOpen, setSearchOpen] = useState(false);
   const location = useLocation();
   const { user, logout } = useAuthStore();
+  const navigate = useNavigate();
   const initials = user?.name?.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() || '??';
 
   return (
@@ -70,7 +72,7 @@ export default function DashboardLayout() {
               <span className="text-sm font-semibold text-zinc-200">AI Assistant</span>
             </div>
             <p className="text-xs text-zinc-400 mb-3">Get AI-powered insights and recommendations.</p>
-            <button className="w-full py-2 text-xs font-medium text-white rounded-lg bg-gradient-to-r from-violet-500 to-blue-500 hover:from-violet-400 hover:to-blue-400 transition-all">
+            <button onClick={() => navigate('/dashboard/chat')} className="w-full py-2 text-xs font-medium text-white rounded-lg bg-gradient-to-r from-violet-500 to-blue-500 hover:from-violet-400 hover:to-blue-400 transition-all">
               Ask SyncFlow AI
             </button>
           </div>

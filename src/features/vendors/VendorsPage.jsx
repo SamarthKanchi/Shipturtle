@@ -227,7 +227,7 @@ export default function VendorsPage() {
                         <span className="text-zinc-300">{v.performance?.rating?.toFixed(1) || '—'}</span>
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-zinc-300">${(v.performance?.totalRevenue || 0).toLocaleString()}</td>
+                    <td className="px-4 py-3 text-zinc-300">₹{(v.performance?.totalRevenue || 0).toLocaleString()}</td>
                     <td className="px-4 py-3 text-zinc-300">
                       {v.performance?.fulfillmentRate ? `${v.performance.fulfillmentRate}%` : '—'}
                     </td>

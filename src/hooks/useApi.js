@@ -81,6 +81,17 @@ export const useDeleteProduct = () => {
   });
 };
 
+export const useDeleteProductOnShopify = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id) => api.delete(`/shopify/delete-product/${id}`).then(r => r.data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['products'] });
+      qc.invalidateQueries({ queryKey: ['shopify-status'] });
+    },
+  });
+};
+
 export const useProductSyncStatus = () =>
   useQuery({
     queryKey: ['products', 'sync-status'],
@@ -161,6 +172,52 @@ export const useRecentOrders = (limit = 5) =>
       return data.orders;
     },
   });
+
+// ─── SHOPIFY TWO-WAY SYNC ────────────────────────────────────────────────────
+
+export const useUpdateProductOnShopify = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, ...body }) => api.put(`/shopify/update-product/${id}`, body).then(r => r.data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['products'] });
+      qc.invalidateQueries({ queryKey: ['shopify-status'] });
+    },
+  });
+};
+
+export const useFulfillOrderOnShopify = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, ...body }) => api.post(`/shopify/fulfill-order/${id}`, body).then(r => r.data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['orders'] });
+      qc.invalidateQueries({ queryKey: ['shopify-status'] });
+    },
+  });
+};
+
+export const useUpdateInventoryOnShopify = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, ...body }) => api.put(`/shopify/update-inventory/${id}`, body).then(r => r.data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['products'] });
+      qc.invalidateQueries({ queryKey: ['shopify-status'] });
+    },
+  });
+};
+
+export const useCreateProductOnShopify = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (body) => api.post('/shopify/create-product', body).then(r => r.data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['products'] });
+      qc.invalidateQueries({ queryKey: ['shopify-status'] });
+    },
+  });
+};
 
 // ─── AUTH ─────────────────────────────────────────────────────────────────────
 

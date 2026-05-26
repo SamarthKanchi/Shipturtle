@@ -167,7 +167,7 @@ function Hero() {
               </div>
               <div className="p-6 grid grid-cols-4 gap-4">
                 {[
-                  { label: 'Revenue', value: '$84,230', change: '+12.5%', color: 'text-emerald-400' },
+                  { label: 'Revenue', value: '₹84,230', change: '+12.5%', color: 'text-emerald-400' },
                   { label: 'Orders', value: '1,847', change: '+8.3%', color: 'text-emerald-400' },
                   { label: 'Vendors', value: '142', change: '+3', color: 'text-blue-400' },
                   { label: 'Fulfillment', value: '97.2%', change: '+1.1%', color: 'text-emerald-400' },
@@ -284,17 +284,17 @@ function Integrations() {
 /* ─── PRICING ─── */
 const plans = [
   {
-    name: 'Starter', price: 49, desc: 'For small marketplaces getting started.',
+    name: 'Starter', price: 3999, desc: 'For small marketplaces getting started.',
     features: ['5 Vendors', '500 Products', 'Basic inventory sync', 'Email support', 'Standard analytics'],
     cta: 'Start Free Trial', popular: false,
   },
   {
-    name: 'Growth', price: 149, desc: 'For growing marketplaces that need AI.',
+    name: 'Growth', price: 11999, desc: 'For growing marketplaces that need AI.',
     features: ['25 Vendors', '5,000 Products', 'AI-powered insights', 'Priority support', 'Multi-store sync', 'Advanced analytics', 'Real-time chat'],
     cta: 'Start Free Trial', popular: true,
   },
   {
-    name: 'Enterprise', price: 499, desc: 'For large-scale operations.',
+    name: 'Enterprise', price: 39999, desc: 'For large-scale operations.',
     features: ['Unlimited vendors', 'Unlimited products', 'Full AI suite', 'Dedicated CSM', 'Custom integrations', 'SLA guarantee', 'Audit logs', 'White-label'],
     cta: 'Contact Sales', popular: false,
   },
@@ -332,7 +332,7 @@ function Pricing() {
               <h3 className="text-xl font-semibold">{plan.name}</h3>
               <p className="mt-2 text-sm text-zinc-400">{plan.desc}</p>
               <div className="mt-6 flex items-baseline gap-1">
-                <span className="text-5xl font-bold">${plan.price}</span>
+                <span className="text-5xl font-bold">₹{plan.price.toLocaleString('en-IN')}</span>
                 <span className="text-zinc-500">/mo</span>
               </div>
               <Link to="/signup"
