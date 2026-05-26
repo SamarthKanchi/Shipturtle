@@ -19,8 +19,45 @@ const PORT = process.env.PORT || 5000;
 
 // ─── MIDDLEWARE ───
 app.use(helmet());
+// Clean up trailing slash and whitespace helper
+const cleanOrigin = (origin) => origin.trim().replace(/\/$/, '');
+
+// Parse allowed origins from env or default to localhost
+const getCorsOrigins = () => {
+  const configured = process.env.CORS_ORIGIN;
+  if (!configured) {
+    return ['http://localhost:5173', 'http://localhost:5174'];
+  }
+  return configured.split(',').map(cleanOrigin);
+};
+
+const allowedOrigins = getCorsOrigins();
+
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+  origin: (origin, callback) => {
+    // If no origin (e.g. server-to-server or REST tools), allow it
+    if (!origin) return callback(null, true);
+
+    const normalizedOrigin = cleanOrigin(origin);
+
+    // Check if the origin matches any allowed origin or if wildcard '*' is in allowed origins
+    const isAllowed = allowedOrigins.some(allowed => {
+      if (allowed === '*') return true;
+      return allowed === normalizedOrigin;
+    });
+
+    if (isAllowed) {
+      return callback(null, true);
+    }
+
+    // Also support local development fallback
+    if (process.env.NODE_ENV === 'development' && (normalizedOrigin.startsWith('http://localhost:') || normalizedOrigin.startsWith('http://127.0.0.1:'))) {
+      return callback(null, true);
+    }
+
+    console.warn(`CORS blocked for origin: ${origin}. Allowed origins:`, allowedOrigins);
+    return callback(new Error('Not allowed by CORS'));
+  },
   credentials: true,
 }));
 app.use(morgan('dev'));
