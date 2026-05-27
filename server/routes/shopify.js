@@ -132,6 +132,12 @@ router.post('/sync-products', protect, async (req, res, next) => {
       });
     }
 
+    // Clean out previously synced Shopify products (handles store switches)
+    const deleted = await Product.deleteMany({ shopifyProductId: { $exists: true, $ne: null } });
+    if (deleted.deletedCount > 0) {
+      console.log(`[Sync] Cleaned ${deleted.deletedCount} old Shopify products before re-sync`);
+    }
+
     const data = await shopifyFetch('products.json?limit=250', shop, token);
     const shopifyProducts = data.products;
 
@@ -176,6 +182,13 @@ router.post('/sync-orders', protect, async (req, res, next) => {
   try {
     const { shop, token } = await resolveShopifyCredentials(req);
     const vendor = await Vendor.findOne({ businessName: 'Shopify Store' });
+
+    // Clean out previously synced Shopify orders (handles store switches)
+    const deleted = await Order.deleteMany({ shopifyOrderId: { $exists: true, $ne: null } });
+    if (deleted.deletedCount > 0) {
+      console.log(`[Sync] Cleaned ${deleted.deletedCount} old Shopify orders before re-sync`);
+    }
+
     const data = await shopifyFetch('orders.json?limit=50&status=any', shop, token);
     const shopifyOrders = data.orders;
 
