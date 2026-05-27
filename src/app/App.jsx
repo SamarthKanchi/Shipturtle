@@ -11,6 +11,7 @@ import ProductsPage from '../features/products/ProductsPage';
 import AnalyticsPage from '../features/analytics/AnalyticsPage';
 import SettingsPage from '../features/settings/SettingsPage';
 import ShopifySync from '../features/shopify/ShopifySync';
+import ShopifyConnectedPage from '../features/shopify/ShopifyConnectedPage';
 import ChatBot from '../features/chat/ChatBot';
 import ProtectedRoute from '../components/ProtectedRoute';
 
@@ -28,6 +29,7 @@ export default function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
+          <Route path="/shopify-connected" element={<ShopifyConnectedPage />} />
           <Route
             path="/dashboard"
             element={
