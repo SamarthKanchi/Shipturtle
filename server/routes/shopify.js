@@ -28,6 +28,18 @@ async function resolveShopifyCredentials(req) {
     }
   }
 
+  // Fallback: find any active OAuth store (handles case where connectedBy wasn't set)
+  const anyStore = await ShopifyStore.findOne({ isActive: true }).sort({ installedAt: -1 });
+  if (anyStore) {
+    // Auto-link this store to the current user so future lookups are fast
+    if (req.user?._id && !anyStore.connectedBy) {
+      anyStore.connectedBy = req.user._id;
+      await anyStore.save();
+      console.log(`[Auth] Auto-linked store ${anyStore.shop} to user ${req.user._id}`);
+    }
+    return { shop: anyStore.shop, token: anyStore.accessToken };
+  }
+
   // Legacy fallback — single store from .env
   const shop = process.env.SHOPIFY_STORE_DOMAIN || 'samarthkanchi35.myshopify.com';
   const token = process.env.SHOPIFY_ACCESS_TOKEN;
