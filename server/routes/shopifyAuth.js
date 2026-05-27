@@ -28,7 +28,7 @@ const router = Router();
 const {
     SHOPIFY_API_KEY,
     SHOPIFY_API_SECRET,
-    SHOPIFY_SCOPES = 'read_products,write_products,read_orders,write_orders,read_inventory,write_inventory,read_fulfillments,write_fulfillments,read_merchant_managed_fulfillment_orders,write_merchant_managed_fulfillment_orders',
+    SHOPIFY_SCOPES = 'read_products,write_products,read_orders,write_orders,read_inventory,write_inventory,read_locations,read_fulfillments,write_fulfillments,read_merchant_managed_fulfillment_orders,write_merchant_managed_fulfillment_orders',
     SHOPIFY_APP_URL,       // e.g. https://your-app.com  (no trailing slash)
     FRONTEND_URL,          // e.g. https://your-app.com  (redirected to after install)
 } = process.env;
