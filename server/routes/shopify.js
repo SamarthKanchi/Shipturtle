@@ -184,12 +184,13 @@ router.post('/sync-orders', protect, async (req, res, next) => {
 
     for (const o of shopifyOrders) {
       try {
-        const lineItems = o.line_items.map(item => ({
+        const rawItems = Array.isArray(o.line_items) ? o.line_items : [];
+        const lineItems = rawItems.map(item => ({
           vendorId: vendor?._id,
-          title: item.title,
+          title: item.title || 'Unknown Item',
           sku: item.sku || '',
-          quantity: item.quantity,
-          price: parseFloat(item.price),
+          quantity: Math.max(parseInt(item.quantity) || 1, 1),
+          price: parseFloat(item.price) || 0,
           fulfillmentStatus: item.fulfillment_status === 'fulfilled' ? 'fulfilled' : 'pending',
         }));
 
@@ -209,25 +210,30 @@ router.post('/sync-orders', protect, async (req, res, next) => {
           { shopifyOrderId: String(o.id) },
           {
             shopifyOrderId: String(o.id),
-            orderNumber: o.name,
+            orderNumber: o.name || `#SHOP-${o.id}`,
             customer: {
               name: `${o.customer?.first_name || ''} ${o.customer?.last_name || ''}`.trim() || 'Guest',
               email: o.customer?.email || o.email || 'unknown@shopify.com',
               phone: o.customer?.phone || '',
             },
-            lineItems,
+            lineItems: lineItems.length > 0 ? lineItems : [{
+              title: 'Unknown Item',
+              quantity: 1,
+              price: parseFloat(o.total_price) || 0,
+              fulfillmentStatus: 'pending',
+            }],
             shippingAddress: o.shipping_address ? {
-              street: o.shipping_address.address1,
-              city: o.shipping_address.city,
-              state: o.shipping_address.province,
-              zip: o.shipping_address.zip,
-              country: o.shipping_address.country,
+              street: o.shipping_address.address1 || '',
+              city: o.shipping_address.city || '',
+              state: o.shipping_address.province || '',
+              zip: o.shipping_address.zip || '',
+              country: o.shipping_address.country || '',
             } : { street: '', city: '', state: '', zip: '', country: '' },
             financials: {
-              subtotal: parseFloat(o.subtotal_price || 0),
+              subtotal: parseFloat(o.subtotal_price) || 0,
               shippingCost: 0,
-              tax: parseFloat(o.total_tax || 0),
-              total: parseFloat(o.total_price || 0),
+              tax: parseFloat(o.total_tax) || 0,
+              total: parseFloat(o.total_price) || 0,
             },
             status: deriveStatus(o),
           },
@@ -235,7 +241,7 @@ router.post('/sync-orders', protect, async (req, res, next) => {
         );
         synced++;
       } catch (err) {
-        console.error(`Failed to sync order ${o.id}:`, err.message);
+        console.error(`Failed to sync order ${o.id} (${o.name}):`, err.message, err.stack);
         errors++;
       }
     }
