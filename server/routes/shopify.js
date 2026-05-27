@@ -17,27 +17,21 @@ const SHOPIFY_API_VERSION = '2026-04';
  *   2. Fall back to env vars (legacy / dev single-store mode)
  */
 async function resolveShopifyCredentials(req) {
-  // OAuth path: look up the store linked to the logged-in user
-  if (req.user?._id) {
-    const record = await ShopifyStore.findOne({
-      connectedBy: req.user._id,
-      isActive: true,
-    });
-    if (record) {
-      return { shop: record.shop, token: record.accessToken };
-    }
-  }
+  // Always prefer the most recently installed active OAuth store
+  const latestStore = await ShopifyStore.findOne({ isActive: true }).sort({ installedAt: -1 });
 
-  // Fallback: find any active OAuth store (handles case where connectedBy wasn't set)
-  const anyStore = await ShopifyStore.findOne({ isActive: true }).sort({ installedAt: -1 });
-  if (anyStore) {
-    // Auto-link this store to the current user so future lookups are fast
-    if (req.user?._id && !anyStore.connectedBy) {
-      anyStore.connectedBy = req.user._id;
-      await anyStore.save();
-      console.log(`[Auth] Auto-linked store ${anyStore.shop} to user ${req.user._id}`);
+  if (latestStore) {
+    // Auto-link to the current user and unlink old stores
+    if (req.user?._id && String(latestStore.connectedBy) !== String(req.user._id)) {
+      await ShopifyStore.updateMany(
+        { connectedBy: req.user._id, _id: { $ne: latestStore._id } },
+        { $unset: { connectedBy: 1 } }
+      );
+      latestStore.connectedBy = req.user._id;
+      await latestStore.save();
+      console.log(`[Auth] Linked latest store ${latestStore.shop} to user ${req.user._id}`);
     }
-    return { shop: anyStore.shop, token: anyStore.accessToken };
+    return { shop: latestStore.shop, token: latestStore.accessToken };
   }
 
   // Legacy fallback — single store from .env
