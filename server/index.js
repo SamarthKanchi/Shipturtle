@@ -105,6 +105,19 @@ app.use((req, res) => {
 // ─── START SERVER ───
 const start = async () => {
   await connectDB();
+
+  // Drop stale unique index on orderNumber (removed from schema — not meaningful across multiple stores)
+  try {
+    const mongoose = (await import('mongoose')).default;
+    await mongoose.connection.collection('orders').dropIndex('orderNumber_1');
+    console.log('[Startup] Dropped stale orderNumber_1 unique index');
+  } catch (e) {
+    // Index already gone or collection doesn't exist yet — that's fine
+    if (!e.message?.includes('not found')) {
+      console.log('[Startup] orderNumber index note:', e.message);
+    }
+  }
+
   app.listen(PORT, () => {
     console.log(`\n⚡ SyncFlow AI API running on http://localhost:${PORT}`);
     console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}\n`);
